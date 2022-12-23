@@ -75,3 +75,33 @@ ORDER BY c_1.customer_id;
 ```
 Оба запроса вернут одинаковый результат, но сложно не заметить, что они написаны с применением разных методик и операторов.
 Вариативность — несомненное преимущество SQL.
+
+## Один и тот же запрос разными способами
+### v1
+```
+WITH c AS (SELECT id, 
+                      name
+           FROM company
+               WHERE status = 'closed'),
+       p AS (SELECT company_id,
+                      first_name
+               FROM people
+               WHERE first_name LIKE '%John%')
+SELECT DISTINCT c.name 
+FROM c JOIN p ON c.id = p.company_id;
+```
+### v2
+```
+SELECT name
+FROM company 
+WHERE status = 'closed' AND id IN (SELECT company_id
+                                   FROM people
+                                   WHERE first_name LIKE '%John%'); 
+```
+### v3
+```
+SELECT DISTINCT c.name 
+FROM company AS c 
+JOIN people AS p ON c.id = p.company_id
+WHERE c.status = 'closed' AND p.first_name LIKE '%John%';
+```
