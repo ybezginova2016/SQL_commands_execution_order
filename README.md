@@ -19,3 +19,28 @@
 ## Правильная последовательность выполнения операторов: 
 ### GROUP BY --> HAVING --> SELECT --> ORDER BY
 **Может показаться странным, что SELECT не на первом месте. Но вид итоговой таблицы формируется после группировки и фильтрации.**
+
+## Примеры кода
+### ОШИБКА
+SELECT customer_id AS customer ,
+       billing_city AS city,
+         total AS total_revenue
+FROM invoice
+WHERE total_revenue > 20; 
+**total_revenue — псевдоним, который назначается уже после среза. Его нельзя использовать в WHERE.**
+
+### ОШИБКА
+SELECT g.name AS genre_name,
+       COUNT(g.name) AS all_genre
+FROM track AS t JOIN genre AS g ON t.genre_id = g.genre_id
+GROUP BY genre_name
+HAVING all_genre > 20; 
+
+**Псевдонимы нельзя использовать и после HAVING, ведь они ещё не назначены.**
+
+### ВЕРНО
+SELECT il.unit_price,
+       i.billing_address
+FROM invoice_line AS il JOIN invoice AS i ON il.invoice_id = i.invoice_id
+WHERE il.unit_price > 0.99
+ORDER BY i.billing_address; 
